@@ -1,0 +1,65 @@
+/* body {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 22px;
+} */
+
+#count_tokens_button {
+  margin-right: 5em;
+}
+
+#count_types_button {
+  margin-right: 5em;
+}
+
+.statistics_buttons {
+  width: 8em;
+}
+
+#count_lemmas_button {
+  width: 9em;
+}
+
+#text_input_card {
+  min-height: 25em;
+}
+/*
+.card {
+  min-height: 25em;
+}
+*/
+
+#example_paginate {
+  padding: 0.5em;
+}
+
+#example_length {
+  padding: 0.5em;
+}
+
+#example_filter {
+  padding: 0.5em;
+}
+
+#types_table {
+  min-height: 5em;
+}
+
+/*
+#ld_results_parent {
+  margin-left: 5em;
+}
+*/
+
+/*
+td {
+  text-align: left;
+}
+*/
+
+#normal_height {
+  min-height: unset;
+}
+
+#quick_help_button {
+  margin: 1em;
+}

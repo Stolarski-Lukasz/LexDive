@@ -1,0 +1,297 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="google-site-verification" content="SouBQwD-vjayqmjz-ohaEt6C0UI-hraX1AfZzaCPrjU" />
+
+  <title>LexDive, software for counting lexical diversity</title>
+
+  <!-- Bootstrap core CSS -->
+  <!-- light theme -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" id="css_light">
+  <link href="{% static 'css/purple.css' %}" rel="stylesheet" id="css_light2">
+  <!-- dark theme -->
+  <link href="{% static 'css/bootstrap-dark.css' %}" rel="stylesheet alternate" id="css_dark">
+
+  <link href="{% static 'css/lexdive.css' %}" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary static-top">
+    <div class="container">
+      <span class="navbar-text" style="color: #ffffff; font-size: 1.2em; padding: 0px;">
+        LexDive
+      </span>
+      <!-- <a class="navbar-brand" href="#">LexDive</a> -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item d-flex align-items-center">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="light_dark_switch">
+              <label class="custom-control-label" for="light_dark_switch"></label>
+            </div>
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-brightness-high" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-right: 1em;">
+              <path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+            </svg>
+          </li>
+          
+          <li class="nav-item active">
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#about_modal">About</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{% static 'readme/readme.pdf' %}" target="_blank">Documentation</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#contact_modal">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+  <div class="modal fade" id="about_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>LexDive</p>
+          <p>A program for counting lexical diversity</p>
+          <p>Ver. 1.3</p>
+          <p>December 2020</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="contact_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Łukasz Stolarski</p>
+          <p>lukasz.stolarski@ujk.edu.pl</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="col-xs-12" style="height:1em;"></div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <!-- <h5 class="mt-5">Welcome to LexDive, a program for measuring lexical diversity.</h5> -->
+        <p class="lead" id="loaded_text_label">Status: no txt file loaded</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card text-center" id="text_input_card">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#file_view" role="tab" aria-controls="home" aria-selected="true">File View</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#text_statistics" role="tab" aria-controls="profile" aria-selected="false">Text Statistics</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#lexical_diversity" role="tab" aria-controls="contact" aria-selected="false">Lexical Diversity</a>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="file_view" role="tabpanel" aria-labelledby="home-tab">
+            <label class="btn btn-primary">Load txt file<input type="file" id="load_button" accept='text/plain' hidden>
+            </label>
+            <div class="col-xs-12" style="height:1em;"></div>
+            <!-- Input text window -->
+            <div class="row">
+              <div class="col-sm">
+                <div class="form-group">
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="9" placeholder="To begin, paste text or load a txt file..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="text_statistics" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="row">
+              <div class="col-sm" id="table_parent">
+                <button type="button" class="btn btn-primary statistics_buttons" id="count_tokens_button">Count Tokens</button>
+                <button type="button" class="btn btn-primary statistics_buttons" id="count_types_button">Count Types</button>
+                <button type="button" class="btn btn-primary statistics_buttons" id="count_lemmas_button">Count Lemmas</button>
+                <div class="col-xs-12" style="height:2em;"></div>
+                <p id="tokens_count_text" style="visibility: hidden">Results</p>
+                <!-- the below is the table skeleton which needs to be created dynamically in js -->
+                <!-- <div class="card mb-4" id="types_table" style="visibility: hidden">
+                      <div class="card-header"><i class="fas fa-table mr-1"></i>Types List</div>
+                      <div class="card-body">
+                          <div class="table-responsive">
+                            <table id="example" class="display" width="100%"></table>
+                          </div>
+                      </div>
+                  </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="lexical_diversity" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="row justify-content-around">
+              <button class="btn btn-primary" id="quick_help_button" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Quick Help
+              </button>
+              
+              <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+                  First, choose "lexical diversity index". If it is MTLD (recommended) or HDD, 
+                  no parameter fitting is available and the calculations will be made on the whole text. 
+                  In other cases, you can change the "sampling method" and, consequently, 
+                  adjust additional options which become available below.
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12" style="height:1em;"></div>
+            <div class="row justify-content-around">
+
+              <div class="col-3">
+                <p>Lexical diversity index:</p>
+                <select id="lexical_diversity_index" class="custom-select mr-sm-2">
+                  <option>MTLD</option>
+                  <option>MTLD (lemmas)</option>
+                  <!-- I disabled proper names correction only at this level - the code behind is still left unchanged -->
+                  <!-- <option>MTLD (proper names correction)</option>
+                  <option>MTLD (lemmas, proper names correction)</option> -->
+                  <option>HDD</option>
+                  <!-- I am not sure whether or not HDD can be used with lemmas -->
+                  <!-- <option>HDD (lemmas)</option> -->
+                  <option>TTR</option>
+                  <option>TTR (lemmas)</option>
+                  <option>Herdan's C</option>
+                  <option>Herdan's C (lemmas)</option>
+                  <option>Guiraud's R</option>
+                  <option>Guiraud's R (lemmas)</option>
+                  <option>Uber U</option>
+                  <option>Uber U (lemmas)</option>
+                </select>
+              </div>
+              
+              <div class="col-3">
+                <p>Sampling method:</p>
+                <select id="sampling_method" class="custom-select mr-sm-2" disabled>
+                  <option>Whole text</option>
+                  <option>Split text</option>
+                  <option>Equal text</option>
+                </select>
+              </div>
+              
+            </div>
+
+            <!-- parameters for "split text" -->
+            <div class="col-xs-12" style="height:1em;"></div>
+            <div class="collapse" id="parameters_split_text">
+              <div class="card card-body">
+                <div class="row justify-content-around">
+                  <div class="col-3">
+                    <p>Sample length:</p>
+                    <input class="form-control-sm" type="number" value="500" min="30" max="1000000" step="100" id="sample_length"/>
+                  </div>
+                  <div class="col-3">
+                    <p>Size of subsamples:</p>
+                    <input class="form-control-sm" type="number" value="50" min="10" max="10000" step="100" id="size_of_subsamples"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- parameters for "equal text" -->
+            <div class="collapse" id="parameters_equal_text">
+              <div class="card card-body">
+                <div class="row justify-content-around">
+                  <div class="col-3">
+                    <p>Sample beginning:</p>
+                    <input class="form-control-sm" type="number" value="1" min="1" max="100000" step="100" id="sample_beginning"/>
+                  </div>
+                  <div class="col-3">
+                    <p>Sample length:</p>
+                    <input class="form-control-sm" type="number" value="500" min="30" max="1000000" step="100" id="sample_length"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xs-12" style="height:1em;"></div>
+            <div class="col-xs-12" style="height:2em;"></div>
+            <div class="row" id="start_button_parent">
+              <div class='col'>
+                <button type="button" class="btn btn-primary" id="lexical_diversity_start_button">START</button>
+              </div>
+            </div>
+            <div class="col-xs-12" style="height:1em;" id="single_break"></div>
+
+            <div class="row justify-content-around" id="ld_results_grandparent">
+
+            </div>
+            <div class="row">
+              <div class="col-sm" id="table_parent2">
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12" style="height:2em;"></div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="{% static 'jquery/jquery.slim.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+  <script src="{% static 'js/datatables-demo.js' %}"></script>
+  <script src="{% static 'js/bootstrap-input-spinner.js' %}"></script>
+  <script>
+    $("input[type='number']").inputSpinner();
+  </script>
+  <script type="module" src="{% static 'js/lexdive.js' %}"></script>
+  
+<!--
+  <script type="module">
+    import {print_example} from "{% static 'js/lexdive_building_functions.js' %}";
+    print_example();
+  </script>
+-->
+
+</body>
+
+</html>

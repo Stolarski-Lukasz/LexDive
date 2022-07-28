@@ -1,0 +1,4 @@
+Sitemap: http://lexdive.pythonanywhere.com/sitemap.xml
+User-agent:*
+Disallow:
+
