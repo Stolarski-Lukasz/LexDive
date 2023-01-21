@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import operator
 from itertools import cycle, compress
 import math
 import numpy as np
@@ -10,6 +9,9 @@ import numpy as np
 from lexical_diversity import lex_div as ld
 
 from app_lexical_diversity.helper_functions import lemmatize_list_of_words, get_subsamples_list, get_ordinal_ending
+from lexdive_modules.my_request_module import RequestTextProcessor
+from lexdive_modules.my_lemmatization_module import LemmatizationProcessor
+from lexdive_modules.my_ld_module import MtldProcessor
 
 from collections import Counter
 import en_core_web_sm
@@ -18,364 +20,44 @@ import en_core_web_sm
 
 @csrf_exempt
 def count_mtld_whole_text(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
-    number_of_tokens = len(data)
+    user_text_split = RequestTextProcessor().split_text(request)
+    mtld_processor = MtldProcessor()
+    mtld_processor.calculate_lexical_diversity(user_text_split=user_text_split)
     
-    # forward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_types = []
-    segment_tokens = []
-    for word in data:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_forward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    forward_mtld = number_of_tokens/factor_count_with_remainder_forward
-  
-    # backward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_types = []
-    segment_tokens = []
-    data = data[::-1]
-    for word in data:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_backward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    backward_mtld = number_of_tokens/factor_count_with_remainder_backward
-    
-    # calculating mean mtld
-    mtld_scores = []
-    mtld_scores.append(forward_mtld)
-    mtld_scores.append(backward_mtld)    
-    mean_mtld = np.mean(mtld_scores)
-    
-    data = {"mtld_value": round(float(mean_mtld), 4),
-            "number_of_tokens": number_of_tokens,
-            "factor_count_forward": round(float(factor_count_with_remainder_forward), 4),
-            "forward_mtld": round(float(forward_mtld), 4),
-            "factor_count_backward": round(float(factor_count_with_remainder_backward), 4),
-            "backward_mtld": round(float(backward_mtld), 4)
+    data = {"mtld_value": round(float(mtld_processor.mtld_mean), 4),
+            "number_of_tokens": mtld_processor.number_of_tokens,
+            "factor_count_forward": round(float(mtld_processor.factor_count_with_remainder_forward), 4),
+            "forward_mtld": round(float(mtld_processor.mtld_score_forward), 4),
+            "factor_count_backward": round(float(mtld_processor.factor_count_with_remainder_backward), 4),
+            "backward_mtld": round(float(mtld_processor.mtld_score_backward), 4)
     }
     return JsonResponse(data)
 
 
 @csrf_exempt
 def count_mtld_whole_text_lemmas(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
-    number_of_tokens = len(data)
-    data_lemmas = lemmatize_list_of_words(data)
+    user_text_split = RequestTextProcessor().split_text(request)
+    lemmatization_processor = LemmatizationProcessor()
+    lemmatization_processor.lemmatize_text(user_text_split)
+    user_text_split_lemmas = lemmatization_processor.text_as_lemmas
+    mtld_processor = MtldProcessor()
+    mtld_processor.calculate_lexical_diversity(user_text_split=user_text_split_lemmas)
     
-    # forward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_lemmas = []
-    segment_tokens = []
-    for word in data_lemmas:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_forward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    forward_mtld = number_of_tokens/factor_count_with_remainder_forward
-  
-    # backward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_lemmas = []
-    segment_tokens = []
-    data_lemmas = data_lemmas[::-1]
-    for word in data_lemmas:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_backward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    backward_mtld = number_of_tokens/factor_count_with_remainder_backward
-    
-    # calculating mean mtld
-    mtld_scores = []
-    mtld_scores.append(forward_mtld)
-    mtld_scores.append(backward_mtld)    
-    mean_mtld = np.mean(mtld_scores)
-    
-    data = {"mtld_value": round(float(mean_mtld), 4),
-            "number_of_tokens": number_of_tokens,
-            "factor_count_forward": round(float(factor_count_with_remainder_forward), 4),
-            "forward_mtld": round(float(forward_mtld), 4),
-            "factor_count_backward": round(float(factor_count_with_remainder_backward), 4),
-            "backward_mtld": round(float(backward_mtld), 4)
+    data = {"mtld_value": round(float(mtld_processor.mtld_mean), 4),
+            "number_of_tokens": mtld_processor.number_of_tokens,
+            "factor_count_forward": round(float(mtld_processor.factor_count_with_remainder_forward), 4),
+            "forward_mtld": round(float(mtld_processor.mtld_score_forward), 4),
+            "factor_count_backward": round(float(mtld_processor.factor_count_with_remainder_backward), 4),
+            "backward_mtld": round(float(mtld_processor.mtld_score_backward), 4)
     }
     return JsonResponse(data)
-
-# HERE
-@csrf_exempt
-def count_mtld_whole_text_pncorrection(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
-
-    ########################################
-    # removing proper names
-    nlp = en_core_web_sm.load()
-    pn_names = nlp(user_text)
-
-    pn_list_initial = []
-    for name in pn_names.ents:
-        if name.label_ == 'PERSON' or name.label_ == 'GPE':
-            name_as_string = name.text
-            name_as_list = name_as_string.split()
-            pn_list_initial.append(name_as_list)
-            
-    pn_list_final = []
-    for pn_expression in pn_list_initial:
-        for pn in pn_expression:
-            pn_list_final.append(pn)
-
-    pn_set_final = set(pn_list_final)
-    no_pn_data = []
-    for word in data:
-        if word in pn_set_final:
-            pass
-        else:
-            no_pn_data.append(word)
-    ########################################
-
-    number_of_tokens = len(no_pn_data)
-    
-    # forward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_types = []
-    segment_tokens = []
-    for word in no_pn_data:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_forward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    forward_mtld = number_of_tokens/factor_count_with_remainder_forward
-  
-    # backward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_types = []
-    segment_tokens = []
-    data = data[::-1]
-    for word in no_pn_data:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_types = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_types / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_backward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    backward_mtld = number_of_tokens/factor_count_with_remainder_backward
-    
-    # calculating mean mtld
-    mtld_scores = []
-    mtld_scores.append(forward_mtld)
-    mtld_scores.append(backward_mtld)    
-    mean_mtld = np.mean(mtld_scores)
-    
-    data = {"mtld_value": round(float(mean_mtld), 4),
-            "number_of_tokens": number_of_tokens,
-            "factor_count_forward": round(float(factor_count_with_remainder_forward), 4),
-            "forward_mtld": round(float(forward_mtld), 4),
-            "factor_count_backward": round(float(factor_count_with_remainder_backward), 4),
-            "backward_mtld": round(float(backward_mtld), 4)
-    }
-    return JsonResponse(data)
-
-
-@csrf_exempt
-def count_mtld_whole_text_lemmas_pncorrection(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
-    
-    ########################################
-    # removing proper names
-    nlp = en_core_web_sm.load()
-    pn_names = nlp(user_text)
-
-    pn_list_initial = []
-    for name in pn_names.ents:
-        if name.label_ == 'PERSON' or name.label_ == 'GPE':
-            name_as_string = name.text
-            name_as_list = name_as_string.split()
-            pn_list_initial.append(name_as_list)
-            
-    pn_list_final = []
-    for pn_expression in pn_list_initial:
-        for pn in pn_expression:
-            pn_list_final.append(pn)
-
-    pn_set_final = set(pn_list_final)
-    no_pn_data = []
-    for word in data:
-        if word in pn_set_final:
-            pass
-        else:
-            no_pn_data.append(word)
-    ########################################
-
-    number_of_tokens = len(no_pn_data)
-    data_lemmas = lemmatize_list_of_words(no_pn_data)
-    
-    # forward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_lemmas = []
-    segment_tokens = []
-    for word in data_lemmas:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_forward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    forward_mtld = number_of_tokens/factor_count_with_remainder_forward
-  
-    # backward processing
-    segment_ttr = 1
-    lengths_of_segments = []
-    segment_list = []
-    segment_lemmas = []
-    segment_tokens = []
-    data_lemmas = data_lemmas[::-1]
-    for word in data_lemmas:
-        if segment_ttr <= 0.72:
-            lengths_of_segments.append(len(segment_list))
-            segment_ttr = 1
-            segment_list = []
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-        else:
-            segment_list.append(word)
-            segment_lemmas = len(set(segment_list))
-            segment_tokens = len(segment_list)
-            segment_ttr = segment_lemmas / segment_tokens
-    result_for_calculation = 1-segment_ttr
-    remainder_segment_percentage_ttr = result_for_calculation/0.28
-    factor_count_with_remainder_backward = len(lengths_of_segments) + remainder_segment_percentage_ttr
-    backward_mtld = number_of_tokens/factor_count_with_remainder_backward
-    
-    # calculating mean mtld
-    mtld_scores = []
-    mtld_scores.append(forward_mtld)
-    mtld_scores.append(backward_mtld)    
-    mean_mtld = np.mean(mtld_scores)
-    
-    data = {"mtld_value": round(float(mean_mtld), 4),
-            "number_of_tokens": number_of_tokens,
-            "factor_count_forward": round(float(factor_count_with_remainder_forward), 4),
-            "forward_mtld": round(float(forward_mtld), 4),
-            "factor_count_backward": round(float(factor_count_with_remainder_backward), 4),
-            "backward_mtld": round(float(backward_mtld), 4)
-    }
-    return JsonResponse(data)
-
 
 
 @csrf_exempt
 def count_hdd_whole_text(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
+    user_text_split = RequestTextProcessor().split_text(request)
 
-    lexical_diversity = ld.hdd(data)
+    lexical_diversity = ld.hdd(user_text_split)
     lexical_diversity = str(lexical_diversity)
 
     data = {"hdd_value": round(float(lexical_diversity), 4)}
@@ -399,9 +81,7 @@ def count_hdd_whole_text_lemmas(request):
 
 @csrf_exempt
 def count_ttr_whole_text(request):
-    return_value = request.POST.dict()
-    user_text = return_value['user_text']
-    data = user_text.split()
+    user_text_split = RequestTextProcessor().split_text(request)
     number_of_tokens = len(data)
     data = set(data)
     number_of_types = len(data)
