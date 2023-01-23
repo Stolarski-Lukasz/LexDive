@@ -1,14 +1,22 @@
-from abc import ABC, abstractclassmethod
+# from abc import ABC, abstractclassmethod
 
-class RequestProcessor(ABC):
+# class RequestProcessor(ABC):
 
-    @abstractclassmethod
-    def split_text(self, request):
-        pass
+#     @abstractclassmethod
+#     def get_resource(self, request, name):
+#         pass
 
-class RequestTextProcessor(RequestProcessor):
+#     @abstractclassmethod
+#     def split_text(self, request, name):
+#         pass
 
-    def split_text(self, request):
-        user_text = request.POST.dict()
-        user_text = user_text['user_text']
+class RequestProcessor():
+
+    def get_resource(self, request, resource_name):
+        request_dict = request.POST.dict()
+        return request_dict[resource_name]
+
+    def split_text(self, request, resource_name="user_text"):
+        request_dict = request.POST.dict()
+        user_text = request_dict[resource_name]
         return user_text.split()

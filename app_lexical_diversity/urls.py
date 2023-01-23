@@ -5,7 +5,6 @@ urlpatterns = [
     path('count_mtld_whole_text/', views.count_mtld_whole_text, name='count_mtld_whole_text'),
     path('count_mtld_whole_text_lemmas/', views.count_mtld_whole_text_lemmas, name='count_mtld_whole_text_lemmas'),
     path('count_hdd_whole_text/', views.count_hdd_whole_text, name='count_hdd_whole_text'),
-    path('count_hdd_whole_text_lemmas/', views.count_hdd_whole_text_lemmas, name='count_hdd_whole_text_lemmas'),
     path('count_ttr_whole_text/', views.count_ttr_whole_text, name='count_ttr_whole_text'),
     path('count_ttr_whole_text_lemmas/', views.count_ttr_whole_text_lemmas, name='count_ttr_whole_text_lemmas'),
     path('count_ttr_split_text/', views.count_ttr_split_text, name='count_ttr_split_text'),
