@@ -16,7 +16,7 @@ class RequestProcessor():
         request_dict = request.POST.dict()
         return request_dict[resource_name]
 
-    def split_text(self, request, resource_name="user_text"):
+    def user_text_to_list(self, request, resource_name="user_text"):
         request_dict = request.POST.dict()
         user_text = request_dict[resource_name]
         return user_text.split()

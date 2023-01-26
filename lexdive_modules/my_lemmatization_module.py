@@ -12,8 +12,8 @@ class LemmatizationProcessor:
         self.lexeme_list = []
         self.complete_lexeme_list = []
 
-    def lemmatize_text(self, user_text_split):
-        user_text_tagged = nltk.pos_tag(user_text_split)
+    def lemmatize_text(self, user_text_list):
+        user_text_tagged = nltk.pos_tag(user_text_list)
         for pair in user_text_tagged:
             # dealing with pronouns
             if pair[0] == "me" or pair[0] == "my" or (pair[0] == "mine" and pair[1] != "NN"):
