@@ -51,6 +51,7 @@ class LemmatizationProcessor:
                 self.text_as_lemmas.append(lemma)
             else:
                 self.text_as_lemmas.append(pair[0])
+        return self.text_as_lemmas
 
     def get_lexeme_list(self):
         for word in self.text_as_lemmas:

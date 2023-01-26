@@ -20,8 +20,6 @@ class SplitTextSamplingProcessor(SamplingProcessor):
         self.number_of_tokens = number_of_tokens
         self.number_of_samples = 0
         self.gap_size = 0
-        # self.number_of_tokens_in_intended_sample = 0
-        # self.number_of_types_in_intended_sample = 0
 
     def sample_text(self, user_text_list):
         self.number_of_samples = self.intended_text_length / self.size_of_subsamples
@@ -30,32 +28,8 @@ class SplitTextSamplingProcessor(SamplingProcessor):
             [True] * int(self.size_of_subsamples) + [False] * int(self.gap_size))
         intended_text = list(compress(user_text_list, criteria))
         intended_text = intended_text[:self.intended_text_length]
-        # self.number_of_tokens_in_intended_sample = len(intended_text)
-        # self.number_of_types_in_intended_sample = len(set(intended_text))
         return intended_text
 
-
-class EqualTextSamplingProcessor(SamplingProcessor):
-
-    def __init__(self, equal_text_beginning, equal_text_length):
-        self.equal_text_beginning = equal_text_beginning
-        self.equal_text_length = equal_text_length
-        # self.number_of_tokens_in_intended_sample = 0
-        # self.number_of_types_in_intended_sample = 0
-        
-
-    def sample_text(self, user_text_list):
-        equal_text = user_text_list[self.equal_text_beginning-1:self.equal_text_length+(self.equal_text_beginning-1)]
-        # self.number_of_tokens_in_intended_sample = len(equal_text)
-        # self.number_of_types_in_intended_sample = len(set(equal_text))
-        return equal_text
-
-
-# Other classes
-###############
-class AuxiliarySamplingProcessor():
-
-    # this method is only for the outcome of SplitTextSamplingProcessor - may be removed there later
     def get_subsamples_list(self, intended_text, size_of_subsamples, number_of_samples):
         word_counter = 1
         words_processed_counter = 1
@@ -96,10 +70,20 @@ class AuxiliarySamplingProcessor():
             subsample = intended_text[missing_tokens_in_last_subsample * -1:]
             single_result.append(subsample)
             subsamples_list.append(single_result)
-
         return subsamples_list
 
-    # this method is only for the outcome of EqualTextSamplingProcessor - may be removed there later
+
+class EqualTextSamplingProcessor(SamplingProcessor):
+
+    def __init__(self, equal_text_beginning, equal_text_length):
+        self.equal_text_beginning = equal_text_beginning
+        self.equal_text_length = equal_text_length
+        
+
+    def sample_text(self, user_text_list):
+        equal_text = user_text_list[self.equal_text_beginning-1:self.equal_text_length+(self.equal_text_beginning-1)]
+        return equal_text
+
     def get_ordinal_ending(self, equal_text_beginning_as_string):
         beginning_word_ordinal_ending = ""
         if equal_text_beginning_as_string[-1:] == "1":

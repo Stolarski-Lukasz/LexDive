@@ -13,7 +13,7 @@ from lexdive_modules.my_lemmatization_module import LemmatizationProcessor
 
 @csrf_exempt
 def count_tokens(request):
-    user_text_split = RequestProcessor().split_text(request)
+    user_text_split = RequestProcessor().user_text_to_list(request)
     number_of_tokens = len(user_text_split)
     data = {'result': number_of_tokens}
     return JsonResponse(data)
@@ -21,7 +21,7 @@ def count_tokens(request):
 
 @csrf_exempt
 def count_types(request):
-    user_text_split = RequestProcessor().split_text(request)
+    user_text_split = RequestProcessor().user_text_to_list(request)
     text_statistics_processor = TextStatisticsProcessor()
     types_count_listoftuples = text_statistics_processor.count_types(user_text_split)
     ranked_types_listoflists = text_statistics_processor.rank_types(types_count_listoftuples)
@@ -31,7 +31,7 @@ def count_types(request):
 
 @csrf_exempt
 def count_lemmas(request):
-    user_text_split = RequestProcessor().split_text(request)
+    user_text_split = RequestProcessor().user_text_to_list(request)
     lemmatization_processor = LemmatizationProcessor()
     lemmatization_processor.lemmatize_text(user_text_split)
     lemmatization_processor.get_lexeme_list()

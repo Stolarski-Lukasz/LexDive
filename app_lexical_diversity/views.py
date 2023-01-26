@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from lexdive_modules.my_request_module import RequestProcessor
-from lexdive_modules.my_text_sampling_module import SplitTextSamplingProcessor, EqualTextSamplingProcessor, AuxiliarySamplingProcessor
+from lexdive_modules.my_text_sampling_module import SplitTextSamplingProcessor, EqualTextSamplingProcessor
 from lexdive_modules.my_lemmatization_module import LemmatizationProcessor
 from lexdive_modules.my_ld_module import MtldProcessor, TtrProcessor, HerdansCProcessor, GuiraudsRProcessor, UberUProcessor
 from lexical_diversity import lex_div as ld
@@ -34,9 +34,7 @@ def count_mtld_whole_text_lemmas(request):
     user_text_list = RequestProcessor().user_text_to_list(request)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
     
     # lexical diversity processing
     mtld_processor = MtldProcessor()
@@ -86,9 +84,7 @@ def count_ttr_whole_text_lemmas(request):
     user_text_list = RequestProcessor().user_text_to_list(request)
 
     # lemmatization  
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     ttr_processor = TtrProcessor()
@@ -115,16 +111,14 @@ def count_ttr_split_text(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
-
+    
     # lexical diversity processing
     ttr_processor = TtrProcessor()
     lexical_diversity = ttr_processor.calculate_lexical_diversity(user_text_list=user_text_list)
     
-    # data PATTERN for split text sampling
     data = {"ttr_value": round(float(lexical_diversity), 4),
             "generated_sample_length": ttr_processor.number_of_tokens,
             "number_of_types": ttr_processor.number_of_typesorlemmas,
@@ -151,15 +145,12 @@ def count_ttr_split_text_lemmas(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
-
+    
     # lemmatization  
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     ttr_processor = TtrProcessor()
@@ -190,7 +181,7 @@ def count_ttr_equal_text(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lexical diversity processing
@@ -220,13 +211,11 @@ def count_ttr_equal_text_lemmas(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lemmatization  
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     ttr_processor = TtrProcessor()
@@ -263,9 +252,7 @@ def count_herdans_c_whole_text_lemmas(request):
     user_text_list = RequestProcessor().user_text_to_list(request)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     herdans_c_processor = HerdansCProcessor()
@@ -292,8 +279,7 @@ def count_herdans_c_split_text(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
@@ -326,15 +312,12 @@ def count_herdans_c_split_text_lemmas(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     herdans_c_processor = HerdansCProcessor()
@@ -365,7 +348,7 @@ def count_herdans_c_equal_text(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lexical diversity processing
@@ -395,13 +378,11 @@ def count_herdans_c_equal_text_lemmas(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     herdans_c_processor = HerdansCProcessor()
@@ -438,9 +419,7 @@ def count_guirauds_r_whole_text_lemmas(request):
     user_text_list = RequestProcessor().user_text_to_list(request)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     guirauds_r_processor = GuiraudsRProcessor()
@@ -467,8 +446,7 @@ def count_guirauds_r_split_text(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
@@ -500,15 +478,12 @@ def count_guirauds_r_split_text_lemmas(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     guirauds_r_processor = GuiraudsRProcessor()
@@ -538,7 +513,7 @@ def count_guirauds_r_equal_text(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lexical diversity processing
@@ -567,13 +542,11 @@ def count_guirauds_r_equal_text_lemmas(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     guirauds_r_processor = GuiraudsRProcessor()
@@ -610,9 +583,7 @@ def count_uber_u_whole_text_lemmas(request):
     user_text_list = RequestProcessor().user_text_to_list(request)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     uber_u_processor = UberUProcessor()
@@ -640,8 +611,7 @@ def count_uber_u_split_text(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
@@ -674,15 +644,12 @@ def count_uber_u_split_text_lemmas(request):
                                                                 size_of_subsamples=size_of_subsamples,
                                                                 number_of_tokens=number_of_tokens)
     user_text_list = split_text_sampling_processor.sample_text(user_text_list=user_text_list)
-    auxilairy_sampling_processor = AuxiliarySamplingProcessor()
-    subsamples_list = auxilairy_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
+    subsamples_list = split_text_sampling_processor.get_subsamples_list(intended_text=user_text_list, 
                                                                 size_of_subsamples=size_of_subsamples, 
                                                                 number_of_samples=split_text_sampling_processor.number_of_samples)
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     uber_u_processor = UberUProcessor()
@@ -712,7 +679,7 @@ def count_uber_u_equal_text(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lexical diversity processing
@@ -742,13 +709,11 @@ def count_uber_u_equal_text_lemmas(request):
 
     # info text generation
     equal_text_beginning_as_string = str(equal_text_beginning)
-    beginning_word_ordinal_ending = AuxiliarySamplingProcessor().get_ordinal_ending(equal_text_beginning_as_string)
+    beginning_word_ordinal_ending = equal_text_sampling_processor.get_ordinal_ending(equal_text_beginning_as_string)
     sample_beginning_info = "The generated sample starts with the " + str(equal_text_beginning) + beginning_word_ordinal_ending + " word of the entire text."
 
     # lemmatization
-    lemmatization_processor = LemmatizationProcessor()
-    lemmatization_processor.lemmatize_text(user_text_list=user_text_list)
-    user_text_list = lemmatization_processor.text_as_lemmas
+    user_text_list = LemmatizationProcessor().lemmatize_text(user_text_list)
 
     # lexical diversity processing
     uber_u_processor = UberUProcessor()
